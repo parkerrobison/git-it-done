@@ -1,6 +1,16 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
 
+var getRepoName = function() {
+    // these two lines will break up the url. the equals sign is the break point 
+    //and the [1] select the second element in the newly created array.
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+    getRepoIssues(repoName);
+    // this will display the repo's name in the header
+    repoNameEl.textContent = repoName;
+}
 var getRepoIssues = function(repo) {
     // after the next line and a fetch command check the network tab in dev tools to see if the fetch request is working.
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -78,4 +88,4 @@ var displayWarning = function(repo) {
     limitWarningEl.appendChild(linkEl);
 };
 
-getRepoIssues("microsoft/accessibility-insights-web");
+getRepoName();
