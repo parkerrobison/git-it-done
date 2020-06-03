@@ -1,4 +1,5 @@
 var issueContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
 
 var getRepoIssues = function(repo) {
     // after the next line and a fetch command check the network tab in dev tools to see if the fetch request is working.
@@ -9,13 +10,17 @@ var getRepoIssues = function(repo) {
             response.json().then(function(data) {
                 // pass response data to dom function (before this is where a console log goes to check data)
                 displayIssues(data);
+
+                // check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    displayWarning(repo);
+                }
             });
         }
         else {
             alert("There was a problem with your request!");
         }
     });
-    console.log(repo);
 };
 
 
@@ -60,4 +65,17 @@ var displayIssues = function(issues) {
     }
 };
 
-getRepoIssues("parkerrobison/git-it-done");
+var displayWarning = function(repo) {
+    // add text to warning container
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See more issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    // append to warning container
+    limitWarningEl.appendChild(linkEl);
+};
+
+getRepoIssues("microsoft/accessibility-insights-web");
