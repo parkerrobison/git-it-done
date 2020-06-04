@@ -7,10 +7,20 @@ var getRepoName = function() {
     //and the [1] select the second element in the newly created array.
     var queryString = document.location.search;
     var repoName = queryString.split("=")[1];
-    getRepoIssues(repoName);
-    // this will display the repo's name in the header
-    repoNameEl.textContent = repoName;
-}
+
+    // if repoName is true
+    if(repoName) {
+        // then display repo name in the header
+        repoNameEl.textContent = repoName;
+        
+        getRepoIssues(repoName);
+    }
+    else {
+        // if repoName doesn't exist redirect to homepage
+        document.location.replace("./index.html");
+    }
+};
+
 var getRepoIssues = function(repo) {
     // after the next line and a fetch command check the network tab in dev tools to see if the fetch request is working.
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -28,7 +38,8 @@ var getRepoIssues = function(repo) {
             });
         }
         else {
-            alert("There was a problem with your request!");
+            // if not successful, redirect to homepage
+            document.location.replace("./index.html");
         }
     });
 };
