@@ -1,5 +1,6 @@
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
+var languageButtonsEl = document.querySelector("#language-buttons");
 
 var getUserRepos = function(user) {
     //format the github api url
@@ -24,8 +25,6 @@ var getUserRepos = function(user) {
         alert("Unable to connect to GitHub");
     });
 };
-
-getUserRepos();
 
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
@@ -60,8 +59,10 @@ var displayRepos = function(repos, searchTerm) {
         var repoName = repos[i].owner.login + "/" + repos[i].name;
 
         // create a container for each loop
-        var repoEl = document.createElement("div");
+        var repoEl = document.createElement("a");
         repoEl.classList = "list-item flex-row justify-space-between align-center";
+        // added this to link the created repoEl elements to the second page. From ? on that is a query parameter.
+        repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
         
         // create a span element to hold repository name
         var titleEl = document.createElement("span");
@@ -90,4 +91,34 @@ var displayRepos = function(repos, searchTerm) {
     }
 }
 
+var getFeaturedRepos = function(language) {
+    // getting the API data
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+    
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            // initially you usually console.log(response) here to make sure that the data will display.
+            // the you swap it for a method to extract JSON from the response
+            response.json().then(function(data) {
+                // another console.log to make sure that data is functioning. It get swapped for a function.
+                displayRepos(data.items, language);
+            });
+        } else {
+            alert("Error: " + response.statusText);
+        }
+    });
+};
+
+var buttonClickHandler = function(event) {
+    var language = event.target.getAttribute("data-language");
+    // console.log(language to make sure its working and then proceed)
+    if (language) {
+        getFeaturedRepos(language);
+
+        // clear old content. This is important to include becasue this function will execute before getFeaturedRepos()
+        repoContainerEl.textContent = "";
+    }
+}
+
 userFormEl.addEventListener("submit", formSubmitHandler);
+languageButtonsEl.addEventListener("click", buttonClickHandler);
